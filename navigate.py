@@ -2,44 +2,33 @@ from tkinter import Tk, Label, Button, StringVar, Canvas
 from time import sleep
 
 class Snake:
-    SIZE = 300, 300
+    SIZE = 600, 600
     TITLE = 'Snake'
     
     def __init__(self, master):
         
         self.master = master
-        self.master.bind('<Up>', self.up)
-        self.master.bind('<Left>', self.left)
-        self.master.bind('<Right>', self.right)
-        self.master.bind('<Down>', self.down)
+        self.master.bind('<Up>', lambda x: self.navigate('up'))
+        self.master.bind('<Left>', lambda x: self.navigate('left'))
+        self.master.bind('<Right>', lambda x: self.navigate('right'))
+        self.master.bind('<Down>', lambda x: self.navigate('down'))
         self.directions = {'down': [0,5,0,5], 'up': [0,-5,0,-5], 'right': [5,0,5,0], 'left': [-5,0,-5,0]}
         self.direction = self.directions.get('right')
 
-        self.w = Canvas(master, width=300, height=200)
+        self.w = Canvas(master, width=self.SIZE[0], height=self.SIZE[1] - 100)
         self.w.pack()
         self.snake_tail = [self.w.create_rectangle(50, 20, 55, 25, fill="#476042"), self.w.create_rectangle(40, 20, 45, 25, fill="#476042"), self.w.create_rectangle(45, 20, 50, 25, fill="#476042")]
         self.w.after(100, self.onTimer)
 
         
     def check_head(self, checklist):
-        if checklist[0] < 0 or checklist[1] < 0 or checklist[2] > 300 or checklist[3] > 200:
+        if checklist[0] < 0 or checklist[1] < 0 or checklist[2] > self.SIZE[0] or checklist[3] > self.SIZE[1] - 100:
             return 1
     
     
-    def down(self, event):
-        self.direction = self.directions.get('down')
-        
-        
-    def up(self, event):
-        self.direction = self.directions.get('up')
-
-        
-    def right(self, event):
-        self.direction = self.directions.get('right')
-
-        
-    def left(self, event):
-        self.direction = self.directions.get('left')
+    def navigate(self, direction):
+        self.direction = self.directions.get(direction)
+        return None
 
         
     def onTimer(self):
@@ -73,5 +62,5 @@ class Snake:
 root = Tk()
 snake = Snake(root)
 root.configure(background='black', )
-root.geometry("300x220")
+root.geometry("{width}x{height}".format(width=snake.SIZE[0],height=snake.SIZE[1] - 80))
 root.mainloop()
