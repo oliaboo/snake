@@ -3,7 +3,7 @@ from time import sleep
 import random
 
 class Snake:
-    SIZE = 600, 600
+    SIZE = 300, 300
     TITLE = 'Snake'
     
     def __init__(self, master):
@@ -20,28 +20,30 @@ class Snake:
         self.w.pack()
         self.snake_tail = [self.w.create_rectangle(50, 20, 55, 25, fill="#476042"), self.w.create_rectangle(40, 20, 45, 25, fill="#476042"), self.w.create_rectangle(45, 20, 50, 25, fill="#476042")]
         self.w.after(100, self.onTimer)
-        x = random.randint(0, (self.SIZE[0] - 5)/5) * 5
-        y = random.randint(0, (self.SIZE[1] - 105)/5) * 5
+        x, y = self.generate_apple_coords()
         self.apple = self.w.create_rectangle(x, y, x+5, y+5, fill="#476042")
-        
-        
+            
+    def generate_apple_coords(self):
+        return random.randint(0, (self.SIZE[0] - 5)/5) * 5, random.randint(0, (self.SIZE[1] - 105)/5) * 5
+
     def check_head(self, checklist):
         if checklist[0] < 0 or checklist[1] < 0 or checklist[2] > self.SIZE[0] or checklist[3] > self.SIZE[1] - 100:
             return 1
-    
-    
+        
     def navigate(self, direction):
         self.direction = self.directions.get(direction)
         return None
-
-        
+    
     def check_eat_apple(self):
         if self.w.coords(self.snake_tail[0]) == self.w.coords(self.apple):
             return True
     
-        
+    def eat_apple(self):
+        self.snake_tail.append(self.w.create_rectangle(self.w.coords(self.snake_tail[len(self.snake_tail)-1])))
+        x, y = self.generate_apple_coords()
+        self.w.coords(self.apple, [x, y, x+5, y+5])
+            
     def onTimer(self):
-        
         if self.check_head(self.w.coords(self.snake_tail[0])):
             self.status_label_text = StringVar()
             self.status_label_text.set('You lost the game')
@@ -61,7 +63,7 @@ class Snake:
                 the_coords[j] += self.direction[j]
             self.w.coords(self.snake_tail[0], the_coords)
             if self.check_eat_apple():
-                print('eat')
+                self.eat_apple()
             self.w.after(100, self.onTimer)
         
         
