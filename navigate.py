@@ -19,12 +19,9 @@ class Snake:
         self.status_label_text = StringVar()
         self.w = Canvas(master, width=self.SIZE[0], height=self.SIZE[1] - 100)
         self.w.pack()
-        
         self.snake_body = [self.w.create_rectangle([50, 20, 55, 25], fill="#476042")]
         for i in range(self.BODY_LEN - 1):
             self.snake_body.append(self.w.create_rectangle([self.w.coords(self.snake_body[-1])[i]+self.directions.get('left')[i] for i in range(len(self.w.coords(self.snake_body[-1])))]))
-
-        #self.snake_body = [self.w.create_rectangle(50, 20, 55, 25, fill="#476042"), self.w.create_rectangle(45, 20, 50, 25, fill="#476042"), self.w.create_rectangle(40, 20, 45, 25, fill="#476042")]
         self.w.after(100, self.onTimer)
         x, y = self.generate_apple_coords()
         self.apple = self.w.create_rectangle(x, y, x+5, y+5, fill="#476042")
@@ -37,12 +34,12 @@ class Snake:
             return 1
         
     def navigate(self, direction):
-        if direction == 'left' and not self.direction == self.directions.get('right') or \
-        direction == 'right' and not self.direction == self.directions.get('left') or \
-        direction == 'down' and not self.direction == self.directions.get('up') or \
-        direction == 'up' and not self.direction == self.directions.get('down'):
+        move_opposites = {'left': 'right', 'right': 'left', 'up': 'down', 'down': 'up'}
+        if self.direction[0] == self.directions.get(move_opposites.get(direction))[0] or \
+        self.direction[1] == self.directions.get(move_opposites.get(direction))[1]:
+            return None
+        else:
             self.direction = self.directions.get(direction)
-        return None
     
     def check_body_collision(self):
         head = self.w.coords(self.snake_body[0])
