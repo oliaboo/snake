@@ -18,7 +18,7 @@ class Snake:
         self.status_label_text = StringVar()
         self.w = Canvas(master, width=self.SIZE[0], height=self.SIZE[1] - 100)
         self.w.pack()
-        self.snake_tail = [self.w.create_rectangle(50, 20, 55, 25, fill="#476042"), self.w.create_rectangle(40, 20, 45, 25, fill="#476042"), self.w.create_rectangle(45, 20, 50, 25, fill="#476042")]
+        self.snake_body = [self.w.create_rectangle(50, 20, 55, 25, fill="#476042"), self.w.create_rectangle(40, 20, 45, 25, fill="#476042"), self.w.create_rectangle(45, 20, 50, 25, fill="#476042")]
         self.w.after(100, self.onTimer)
         x, y = self.generate_apple_coords()
         self.apple = self.w.create_rectangle(x, y, x+5, y+5, fill="#476042")
@@ -39,39 +39,41 @@ class Snake:
         return None
     
     def check_body_collision(self):
-        head = self.w.coords(self.snake_tail[0])
-        for i in range(1, len(self.snake_tail)):
-            if head == self.w.coords(self.snake_tail[i]):
+        head = self.w.coords(self.snake_body[0])
+        for i in range(1, len(self.snake_body)):
+            if head == self.w.coords(self.snake_body[i]):
                 return 1
         return 0
     
     def check_eat_apple(self):
-        if self.w.coords(self.snake_tail[0]) == self.w.coords(self.apple):
+        if self.w.coords(self.snake_body[0]) == self.w.coords(self.apple):
             return True
     
     def eat_apple(self):
-        self.snake_tail.append(self.w.create_rectangle(self.w.coords(self.snake_tail[len(self.snake_tail)-1])))
+        self.snake_body.append(self.w.create_rectangle(self.w.coords(self.snake_body[len(self.snake_body)-1])))
         x, y = self.generate_apple_coords()
         self.w.coords(self.apple, [x, y, x+5, y+5])
             
     def onTimer(self):
-        if self.check_body_collision() or self.check_border_collision(self.w.coords(self.snake_tail[0])):      
+        if self.check_body_collision() or self.check_border_collision(self.w.coords(self.snake_body[0])):      
             self.status_label_text.set('You lost the game')
             self.status_label = Label(self.master, textvariable=self.status_label_text)
             self.status_label.pack()
         else:
-            tmp = self.w.coords(self.snake_tail[0])
-            for i in range(1, len(self.snake_tail)):
-                tmp1 = self.w.coords(self.snake_tail[i])
-                self.w.coords(self.snake_tail[i], tmp)
+            # assign head to tmp
+            tmp = self.w.coords(self.snake_body[0])
+            for i in range(1, len(self.snake_body)):
+                tmp1 = self.w.coords(self.snake_body[i])
+                # assign coords of prev elem to the next
+                self.w.coords(self.snake_body[i], tmp)
                 tmp = tmp1
                 
                 
-            # head = self.w.coords(self.snake_tail[0])
-            the_coords = self.w.coords(self.snake_tail[0])
+            # head = self.w.coords(self.snake_body[0])
+            the_coords = self.w.coords(self.snake_body[0])
             for j in range(len(the_coords)):
                 the_coords[j] += self.direction[j]
-            self.w.coords(self.snake_tail[0], the_coords)
+            self.w.coords(self.snake_body[0], the_coords)
             if self.check_eat_apple():
                 self.eat_apple()
             self.w.after(100, self.onTimer)
