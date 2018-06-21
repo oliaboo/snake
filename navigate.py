@@ -5,6 +5,7 @@ import random
 class Snake:
     SIZE = 300, 300
     TITLE = 'Snake'
+    BODY_LEN = 3
     
     def __init__(self, master):
         
@@ -18,7 +19,12 @@ class Snake:
         self.status_label_text = StringVar()
         self.w = Canvas(master, width=self.SIZE[0], height=self.SIZE[1] - 100)
         self.w.pack()
-        self.snake_body = [self.w.create_rectangle(50, 20, 55, 25, fill="#476042"), self.w.create_rectangle(40, 20, 45, 25, fill="#476042"), self.w.create_rectangle(45, 20, 50, 25, fill="#476042")]
+        
+        self.snake_body = [self.w.create_rectangle([50, 20, 55, 25], fill="#476042")]
+        for i in range(self.BODY_LEN - 1):
+            self.snake_body.append(self.w.create_rectangle([self.w.coords(self.snake_body[-1])[i]+self.directions.get('left')[i] for i in range(len(self.w.coords(self.snake_body[-1])))]))
+
+        #self.snake_body = [self.w.create_rectangle(50, 20, 55, 25, fill="#476042"), self.w.create_rectangle(45, 20, 50, 25, fill="#476042"), self.w.create_rectangle(40, 20, 45, 25, fill="#476042")]
         self.w.after(100, self.onTimer)
         x, y = self.generate_apple_coords()
         self.apple = self.w.create_rectangle(x, y, x+5, y+5, fill="#476042")
