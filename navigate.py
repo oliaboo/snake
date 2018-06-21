@@ -15,7 +15,7 @@ class Snake:
         self.master.bind('<Down>', lambda x: self.navigate('down'))
         self.directions = {'down': [0,5,0,5], 'up': [0,-5,0,-5], 'right': [5,0,5,0], 'left': [-5,0,-5,0]}
         self.direction = self.directions.get('right')
-
+        self.status_label_text = StringVar()
         self.w = Canvas(master, width=self.SIZE[0], height=self.SIZE[1] - 100)
         self.w.pack()
         self.snake_tail = [self.w.create_rectangle(50, 20, 55, 25, fill="#476042"), self.w.create_rectangle(40, 20, 45, 25, fill="#476042"), self.w.create_rectangle(45, 20, 50, 25, fill="#476042")]
@@ -26,13 +26,24 @@ class Snake:
     def generate_apple_coords(self):
         return random.randint(0, (self.SIZE[0] - 5)/5) * 5, random.randint(0, (self.SIZE[1] - 105)/5) * 5
 
-    def check_head(self, checklist):
+    def check_border_collision(self, checklist):
         if checklist[0] < 0 or checklist[1] < 0 or checklist[2] > self.SIZE[0] or checklist[3] > self.SIZE[1] - 100:
             return 1
         
     def navigate(self, direction):
-        self.direction = self.directions.get(direction)
+        if direction == 'left' and not self.direction == self.directions.get('right') or \
+        direction == 'right' and not self.direction == self.directions.get('left') or \
+        direction == 'down' and not self.direction == self.directions.get('up') or \
+        direction == 'up' and not self.direction == self.directions.get('down'):
+            self.direction = self.directions.get(direction)
         return None
+    
+    def check_body_collision(self):
+        head = self.w.coords(self.snake_tail[0])
+        for i in range(1, len(self.snake_tail)):
+            if head == self.w.coords(self.snake_tail[i]):
+                return 1
+        return 0
     
     def check_eat_apple(self):
         if self.w.coords(self.snake_tail[0]) == self.w.coords(self.apple):
@@ -44,8 +55,7 @@ class Snake:
         self.w.coords(self.apple, [x, y, x+5, y+5])
             
     def onTimer(self):
-        if self.check_head(self.w.coords(self.snake_tail[0])):
-            self.status_label_text = StringVar()
+        if self.check_body_collision() or self.check_border_collision(self.w.coords(self.snake_tail[0])):      
             self.status_label_text.set('You lost the game')
             self.status_label = Label(self.master, textvariable=self.status_label_text)
             self.status_label.pack()
